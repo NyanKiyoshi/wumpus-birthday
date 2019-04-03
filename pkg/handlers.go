@@ -39,7 +39,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	message := strings.TrimLeft(m.Content[len(prefix):], " ")
-	commands := strings.SplitN(message, " ", 2)
+	commands := strings.Fields(message)
 
 	switch commands[0] {
 	case "remove":
@@ -49,6 +49,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		listing.List(s, m)
 		return
 	default:
-		adding.Add(s, m)
+		adding.Add(s, m, commands[1:])
 	}
 }

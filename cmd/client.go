@@ -4,18 +4,34 @@ import (
 	"flag"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"github.com/jmoiron/sqlx"
+
+	// SQLite3 driver for the database
+	_ "github.com/mattn/go-sqlite3"
+
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"wumpus-birthday/pkg"
+	"wumpus-birthday/pkg/globals"
+	"wumpus-birthday/pkg/storage"
 )
 
 var token string
+var dbFilePath string
 
 func init() {
 	flag.StringVar(&token, "t", "", "The Bot Token")
+	flag.StringVar(&dbFilePath, "db", "./data.sqlite", "The database path")
 	flag.Parse()
+
+	if db, err := sqlx.Connect("sqlite3", dbFilePath); err != nil {
+		log.Fatal("failed to open the sqlite database:", err)
+	} else {
+		globals.DB = db
+		db.MustExec(storage.Schema)
+	}
 }
 
 func main() {
