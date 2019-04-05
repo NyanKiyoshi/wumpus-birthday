@@ -48,7 +48,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "list":
 		listing.List(s, m)
 		return
+	case "today":
+		listing.ListToday(s, m)
+		return
 	default:
-		adding.Add(s, m, commands[1:])
+		adding.Add(s, m, commands)
 	}
 }
