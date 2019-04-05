@@ -2,11 +2,16 @@ package listing
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"log"
+	"time"
+	"wumpus-birthday/pkg/storage"
 )
 
 func List(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if _, err := s.ChannelMessageSend(m.ChannelID, "Listing..."); err != nil {
-		log.Printf("Failed to send listing: %s", err)
+	birthdays, err := storage.Get(time.Now())
+	if err != nil {
+		_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
+		return
 	}
+
+	_, _ = s.ChannelMessageSend(m.ChannelID, string(len(birthdays)))
 }

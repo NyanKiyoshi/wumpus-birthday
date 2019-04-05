@@ -61,6 +61,11 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
+	// Close the database
+	if err := globals.DB.Close(); err != nil {
+		log.Print(err)
+	}
+
 	// Cleanly close down the Discord session.
 	if err := dg.Close(); err != nil {
 		log.Fatal(err)
