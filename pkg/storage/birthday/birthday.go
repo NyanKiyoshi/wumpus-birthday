@@ -33,7 +33,7 @@ func Today() ([]Birthday, error) {
 func Get(day *time.Time) ([]Birthday, error) {
 	var foundBirthdays []Birthday
 	if err := globals.DB.Select(
-		&foundBirthdays, selectDate, timeutil.Strftime(&day, "%d-%m")); err != nil {
+		&foundBirthdays, selectDate, timeutil.Strftime(day, "%d-%m")); err != nil {
 
 		return nil, fmt.Errorf("failed to get birthdays: %s", err)
 	}

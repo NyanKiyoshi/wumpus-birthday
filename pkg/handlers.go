@@ -51,6 +51,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "today":
 		listing.ListToday(s, m)
 		return
+	case "help":
+		_, _ = s.ChannelMessageSend(m.ChannelID, helpText)
+		return
 	default:
 		adding.Add(s, m, commands)
 	}
