@@ -17,7 +17,11 @@ SELECT * FROM birthdays;
 `
 
 const insert string = `
-INSERT INTO birthdays(user_id, date) VALUES ($1, $2);
+INSERT OR REPLACE INTO birthdays(user_id, date) VALUES ($1, $2);
+`
+
+const remove string = `
+DELETE FROM birthdays WHERE user_id = $1;
 `
 
 type Birthday struct {
@@ -50,5 +54,10 @@ func GetAll() ([]Birthday, error) {
 
 func Add(userID string, date time.Time) error {
 	_, err := globals.DB.Exec(insert, userID, date)
+	return err
+}
+
+func Remove(userID string) error {
+	_, err := globals.DB.Exec(remove, userID)
 	return err
 }
