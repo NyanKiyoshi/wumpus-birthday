@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jmoiron/sqlx"
+	"sync"
+	"wumpus-birthday/pkg/notifying"
 
 	// SQLite3 driver for the database
 	_ "github.com/mattn/go-sqlite3"
@@ -52,6 +54,16 @@ func main() {
 		return
 	}
 
+	wg := sync.WaitGroup{}
+
+	stopRoutines := make(chan bool)
+
+	go func() {
+		wg.Add(1)
+		notifying.WaitForEver(dg, stopRoutines)
+		wg.Done()
+	}()
+
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running. Press CTRL-C to exit.")
 	fmt.Printf(
@@ -60,6 +72,10 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
+
+	// Stop the go routine
+	stopRoutines <- true
+	wg.Wait()
 
 	// Close the database
 	if err := globals.DB.Close(); err != nil {
