@@ -10,11 +10,11 @@ import (
 	"wumpus-birthday/pkg/storage/birthday"
 )
 
-func addDate(userID string, date string) string {
+func addDate(serverID string, userID string, date string) string {
 	parsedDate, err := dateparse.ParseAny(date)
 
 	if err == nil {
-		if err = birthday.Add(userID, parsedDate); err != nil {
+		if err = birthday.Add(serverID, userID, parsedDate); err != nil {
 			return err.Error()
 		}
 		return fmt.Sprint("Added: ", parsedDate.String())
@@ -36,7 +36,7 @@ func addDateFromMention(
 
 	// If the user id was passed, ensure the user is a moderator
 	if permissions.IsAuthorModerator(s, m) {
-		return addDate(userID, date)
+		return addDate(m.GuildID, userID, date)
 	}
 	return "Not enough privileges to add someone's birthday."
 }
@@ -52,7 +52,7 @@ func parseMessage(
 	}
 
 	// Continue parsing
-	return addDate(m.Author.ID, mention+" "+date)
+	return addDate(m.GuildID, m.Author.ID, mention+" "+date)
 }
 
 func Add(s *discordgo.Session, m *discordgo.MessageCreate, commands []string) {

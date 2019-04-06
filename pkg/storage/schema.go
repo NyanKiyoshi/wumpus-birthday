@@ -4,8 +4,9 @@ package storage
 var Schema = `
 CREATE TABLE IF NOT EXISTS birthdays (
     user_id text,
-    date DATETIME
-);
+	server_id text,
+    date DATETIME,
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_birthdays_user_id ON birthdays (user_id);
+	PRIMARY KEY (user_id, server_id)
+);
 `

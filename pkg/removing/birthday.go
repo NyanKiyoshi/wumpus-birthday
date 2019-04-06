@@ -6,7 +6,7 @@ import (
 )
 
 func Remove(s *discordgo.Session, m *discordgo.MessageCreate) {
-	err := birthday.Remove(m.Author.ID)
+	err := birthday.Remove(m.GuildID, m.Author.ID)
 
 	if err == nil {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "Your birthday has been removed!")

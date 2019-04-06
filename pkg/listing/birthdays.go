@@ -47,11 +47,11 @@ func sendList(
 }
 
 func List(s *discordgo.Session, m *discordgo.MessageCreate) {
-	birthdays, err := birthday.GetAll()
+	birthdays, err := birthday.GetAll(m.GuildID)
 	sendList(s, m, birthdays, err)
 }
 
 func ListToday(s *discordgo.Session, m *discordgo.MessageCreate) {
-	birthdays, err := birthday.Today()
+	birthdays, err := birthday.Today(m.GuildID)
 	sendList(s, m, birthdays, err)
 }
