@@ -43,6 +43,10 @@ func sendList(
 		msg += fmt.Sprintf("<@!%s> on %s\n", day.UserID, formatDate(day.Date))
 	}
 
+	if len(msg) > 2000 {
+		msg = msg[:1960] + "\nAnd more..."
+	}
+
 	messaging.ReplyDM(s, m.Message, &msg)
 }
 
