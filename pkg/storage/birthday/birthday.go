@@ -8,13 +8,19 @@ import (
 )
 
 const selectDate string = `
-SELECT user_id, date FROM birthdays 
+SELECT * FROM birthdays 
 WHERE strftime('%d-%m', date) = $1 AND server_id = $2
 ORDER BY date;
 `
 
+const selectDateAllServers string = `
+SELECT * FROM birthdays 
+WHERE strftime('%d-%m', date) = $1
+ORDER BY date;
+`
+
 const selectAll string = `
-SELECT user_id, date FROM birthdays
+SELECT * FROM birthdays
 WHERE server_id = $1
 ORDER BY date;
 `
@@ -28,8 +34,9 @@ DELETE FROM birthdays WHERE server_id = $2 AND user_id = $1;
 `
 
 type Birthday struct {
-	Date   time.Time `db:"date,required"`
-	UserID string    `db:"user_id,required"`
+	Date     time.Time `db:"date,required"`
+	UserID   string    `db:"user_id,required"`
+	ServerID string    `db:"server_id"`
 }
 
 func Today(serverID string) ([]Birthday, error) {
@@ -37,12 +44,23 @@ func Today(serverID string) ([]Birthday, error) {
 	return Get(serverID, &today)
 }
 
+func TodayAllServers() ([]Birthday, error) {
+	today := time.Now()
+	return Get("", &today)
+}
+
 func Get(serverID string, day *time.Time) ([]Birthday, error) {
 	var foundBirthdays []Birthday
-	if err := globals.DB.Select(
-		&foundBirthdays, selectDate,
-		timeutil.Strftime(day, "%d-%m"), serverID); err != nil {
+	var err error
+	formattedDate := timeutil.Strftime(day, "%d-%m")
 
+	if serverID == "" {
+		err = globals.DB.Select(&foundBirthdays, selectDateAllServers, formattedDate)
+	} else {
+		err = globals.DB.Select(&foundBirthdays, selectDate, formattedDate, serverID)
+	}
+
+	if err != nil {
 		return nil, fmt.Errorf("failed to get birthdays: %s", err)
 	}
 	return foundBirthdays, nil

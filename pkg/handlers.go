@@ -6,6 +6,7 @@ import (
 	"strings"
 	"wumpus-birthday/pkg/adding"
 	"wumpus-birthday/pkg/listing"
+	"wumpus-birthday/pkg/notifying"
 	"wumpus-birthday/pkg/removing"
 )
 
@@ -50,6 +51,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	case "today":
 		listing.ListToday(s, m)
+		return
+	case "sentences":
+		if err := notifying.Dispatch(s, m.Message, commands[1:]); err != "" {
+			_, _ = s.ChannelMessageSend(m.ChannelID, err)
+		}
 		return
 	case "help":
 		_, _ = s.ChannelMessageSend(m.ChannelID, helpText)
